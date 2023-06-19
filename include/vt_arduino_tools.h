@@ -11,7 +11,7 @@ namespace vt {
      * @param last Value
      * @return built Arduino String
      */
-    template<typename T>
+    template<size_t = 0, typename T>
     String build_string(T last) { return String(last); }
 
     /**
@@ -26,7 +26,7 @@ namespace vt {
         s0.reserve(StringReserveSize);
         s0 += String(first);
         s0 += ",";
-        s0 += build_string<Ts...>(args...);
+        s0 += build_string<StringReserveSize, Ts...>(args...);
         return s0;
     }
 
