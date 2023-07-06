@@ -1,5 +1,5 @@
-#ifndef VT_ARDUINO_TOOLS_VT_ARDUINO_TOOLS_H
-#define VT_ARDUINO_TOOLS_VT_ARDUINO_TOOLS_H
+#ifndef VT_ARDUINO_TOOLS_ARDUINO_TOOLS_H
+#define VT_ARDUINO_TOOLS_ARDUINO_TOOLS_H
 
 #include <Arduino.h>
 #include <stdint.h>
@@ -11,7 +11,7 @@ namespace vt {
      * @param last Value
      * @return built Arduino String
      */
-    template<size_t = 0, typename T>
+    template<size_t = 0, bool = false, typename T>
     String build_string(T last) { return String(last); }
 
     /**
@@ -20,13 +20,13 @@ namespace vt {
      * @param args Values
      * @return built Arduino String
      */
-    template<size_t StringReserveSize = 128, typename T, typename... Ts>
+    template<size_t StringReserveSize = 128, bool Reserve = true, typename T, typename... Ts>
     String build_string(T first, Ts... args) {
         String s0 = "";
-        s0.reserve(StringReserveSize);
+        if (Reserve) s0.reserve(StringReserveSize);
         s0 += String(first);
         s0 += ",";
-        s0 += build_string<StringReserveSize, Ts...>(args...);
+        s0 += build_string<StringReserveSize, false, Ts...>(args...);
         return s0;
     }
 
@@ -61,4 +61,4 @@ namespace vt {
     }
 }
 
-#endif //VT_ARDUINO_TOOLS_VT_ARDUINO_TOOLS_H
+#endif //VT_ARDUINO_TOOLS_ARDUINO_TOOLS_H
