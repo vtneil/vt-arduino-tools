@@ -5,15 +5,16 @@
 
 namespace vt {
     /**
-     * Smart Delay wrapper class
+     * Smart Delay with Adaptive interval adjustment wrapper class
      */
     class smart_delay {
     private:
         typedef uint32_t (*time_func)();
 
         time_func func;
-        uint32_t interval;
+        uint32_t target_interval_val;
         uint32_t previous_time;
+        uint32_t true_interval_val = target_interval_val;
 
     public:
         /**
@@ -23,7 +24,7 @@ namespace vt {
          * @param func
          */
         smart_delay(uint32_t interval, time_func func)
-                : func{func}, interval{interval} { previous_time = func(); }
+                : func{func}, target_interval_val{interval} { previous_time = func(); }
 
         /**
          * Default copy constructor
@@ -43,25 +44,30 @@ namespace vt {
         explicit operator bool() { return has_passed(); }
 
         /**
-         * Conversion to uint32_t returns interval.
+         * Conversion to uint32_t returns target_interval_val.
          *
          * @return
          */
-        explicit operator uint32_t() const { return interval; }
+        explicit operator uint32_t() const { return target_interval_val; }
 
         /**
-         * Reset timer's interval.
+         * Reset timer's target_interval_val.
          */
         void reset() { previous_time = func(); }
 
         /**
-         * Check if the interval has passed.
+         * Check if the target_interval_val has passed.
          *
          * @return
          */
         bool has_passed() {
             uint32_t curr_time = func();
-            if (curr_time - previous_time >= interval) {
+            // Adaptive interval adjustment
+            if (curr_time - previous_time >= true_interval_val) {
+                uint32_t delta_e = (target_interval_val > true_interval_val) ?
+                                   target_interval_val - true_interval_val :
+                                   true_interval_val - target_interval_val;
+                true_interval_val -= delta_e;
                 previous_time = curr_time;
                 return true;
             }
@@ -69,11 +75,11 @@ namespace vt {
         }
 
         /**
-         * Set a new interval.
+         * Set a new target_interval_val.
          *
          * @param new_interval
          */
-        void set_interval(uint32_t new_interval) { interval = new_interval; }
+        void set_interval(uint32_t new_interval) { target_interval_val = new_interval; }
 
         /**
          * Set time function, i.e., millis or micros.
@@ -81,6 +87,10 @@ namespace vt {
          * @param new_func
          */
         void set_time_func(time_func new_func) { func = new_func; }
+
+        const uint32_t &target_interval = target_interval_val;
+
+        const uint32_t &true_interval = true_interval_val;
     };
 }
 
