@@ -67,7 +67,8 @@ namespace vt {
                 uint32_t delta_e = (target_interval_val > true_interval_val) ?
                                    target_interval_val - true_interval_val :
                                    true_interval_val - target_interval_val;
-                true_interval_val -= delta_e;
+                if (delta_e < true_interval_val) true_interval_val -= delta_e;
+                else true_interval_val = 0;
                 previous_time = curr_time;
                 return true;
             }
