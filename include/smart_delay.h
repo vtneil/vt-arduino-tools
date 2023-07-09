@@ -93,6 +93,49 @@ namespace vt {
 
         const uint32_t &true_interval = true_interval_val;
     };
+
+    class smart_delay_non_adaptive {
+    private:
+        typedef uint32_t (*time_func)();
+
+        time_func func;
+        uint32_t target_interval_val;
+        uint32_t previous_time;
+        uint32_t true_interval_val = target_interval_val;
+
+    public:
+        smart_delay_non_adaptive(uint32_t interval, time_func func)
+                : func{func}, target_interval_val{interval} { previous_time = func(); }
+
+        smart_delay_non_adaptive(const smart_delay_non_adaptive &) = default;
+
+        smart_delay_non_adaptive(smart_delay_non_adaptive &&) noexcept = delete;
+
+        explicit operator bool() { return has_passed(); }
+
+        explicit operator uint32_t() const { return target_interval_val; }
+
+        void reset() { previous_time = func(); }
+
+        bool has_passed() {
+            uint32_t curr_time = func();
+            uint32_t delta_t = curr_time - previous_time;
+            if (delta_t >= target_interval_val) {
+                true_interval_val = delta_t;
+                previous_time = curr_time;
+                return true;
+            }
+            return false;
+        }
+
+        void set_interval(uint32_t new_interval) { target_interval_val = new_interval; }
+
+        void set_time_func(time_func new_func) { func = new_func; }
+
+        const uint32_t &target_interval = target_interval_val;
+
+        const uint32_t &true_interval = true_interval_val;
+    };
 }
 
 #endif //VT_ARDUINO_TOOLS_SMART_DELAY_H
