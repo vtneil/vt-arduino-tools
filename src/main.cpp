@@ -4,7 +4,7 @@
 using namespace vt;
 
 smart_delay sd1(1000, millis);  // smart delay 1,000 ms ( 1  s )
-smart_delay sd2(2000, micros);  // smart delay 2,000 us ( 2 ms )
+smart_delay sd2(200000, micros);  // smart delay 200,000 us ( 200 ms )
 task_scheduler<3> scheduler;
 
 void setup() {

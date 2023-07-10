@@ -70,7 +70,7 @@ namespace vt {
                                    target_interval_val - true_interval_val :
                                    true_interval_val - target_interval_val;
                 if (delta_e < true_interval_val) true_interval_val -= delta_e;
-                else true_interval_val = 0;
+                else true_interval_val += delta_e;
                 previous_time = curr_time;
                 return true;
             }
