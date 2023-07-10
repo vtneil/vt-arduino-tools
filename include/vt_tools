@@ -1,3 +1,4 @@
 #include "static_string.h"
 #include "arduino_tools.h"
 #include "smart_delay.h"
+#include "task_scheduler.h"
