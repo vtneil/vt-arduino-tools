@@ -3,25 +3,20 @@
 
 using namespace vt;
 
-smart_delay sd1(1000, millis);  // smart delay 1,000 ms ( 1  s )
-smart_delay sd2(200000, micros);  // smart delay 200,000 us ( 200 ms )
-task_scheduler<3> scheduler;
+String s;
 
 void setup() {
-    scheduler.add_task([]() -> void { Serial.println("Func 1"); }, 250, millis);
-    scheduler.add_task([]() -> void { Serial.println("Func 2"); }, 500, millis);
-    scheduler.add_task([]() -> void { Serial.println("Func 3"); }, 1000, millis);
+    pinMode(PC13, OUTPUT);
     Serial.begin(115200);
+    s = "Hello";
+    s.reserve(100);
+    build_string_to(s, "b1", "b2", "b3", "b4", 5, 7, 999.99);
 }
 
 void loop() {
-    scheduler.exec();
-
-    if (sd1) {  // or sd1.has_passed()
-        Serial.println("Timer 1 OK!");
-    }
-
-    if (sd2) {
-        Serial.println("Timer 2 OK!");
-    }
+    digitalWrite(PC13, !digitalRead(PC13));
+    Serial.print(s.length());
+    Serial.print(" ");
+    Serial.println(s);
+    delay(1000);
 }

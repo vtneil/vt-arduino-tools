@@ -1,42 +1,61 @@
 #ifndef VT_ARDUINO_TOOLS_ARDUINO_TOOLS_H
 #define VT_ARDUINO_TOOLS_ARDUINO_TOOLS_H
 
-#include <Arduino.h>
 #include <stdint.h>
 #include <string.h>
+#include <Arduino.h>
 
 namespace vt {
+    template<bool First = true, typename T>
+    String &build_string_to(String &s0, const T &val) {
+        if (First) s0 = "";
+        s0 += val;
+        return s0;
+    }
+
+    template<bool First = true, typename T, typename ...Ts>
+    String &build_string_to(String &s0, const T &val, const Ts (&...vals)) {
+        if (First) s0 = "";
+        s0 += val;
+        s0 += ",";
+        build_string_to<false, Ts...>(s0, vals...);
+        return s0;
+    }
+
     /**
      * Build Arduino String from multiple fields, separated by commas.
-     * @param last Value
+     * @param val Value
      * @return built Arduino String
      */
     template<size_t = 0, bool = false, typename T>
-    String build_string(T last) { return String(last); }
+    String build_string(const T &val) { return String(val); }
+
+    template<size_t = 0, bool = false, typename = String>
+    String build_string(const String &val) { return val; }
 
     /**
      * Build Arduino String from multiple fields, separated by commas.
-     * @param first Value
-     * @param args Values
+     * @param val Value
+     * @param vals Values
      * @return built Arduino String
      */
-    template<size_t StringReserveSize = 128, bool Reserve = true, typename T, typename... Ts>
-    String build_string(T first, Ts... args) {
+    template<size_t StringReserveSize = 128, bool Reserve = true, typename T, typename ...Ts>
+    String build_string(const T &val, const Ts (&...vals)) {
         String s0 = "";
         if (Reserve) s0.reserve(StringReserveSize);
-        s0 += String(first);
+        s0 += val;
         s0 += ",";
-        s0 += build_string<StringReserveSize, false, Ts...>(args...);
+        s0 += build_string<StringReserveSize, false, Ts...>(vals...);
         return s0;
     }
 
     template<typename SerialT = HardwareSerial, SerialT *stream = &Serial, typename T>
-    void write_stream(T last) { stream->write(last); }
+    void write_stream(T val) { stream->write(val); }
 
     template<typename SerialT = HardwareSerial, SerialT *stream = &Serial, typename T, typename... Ts>
-    void write_stream(T first, Ts... args) {
-        stream->write(first);
-        write_stream<SerialT, stream, Ts...>(args...);
+    void write_stream(T val, Ts... vals) {
+        stream->write(val);
+        write_stream<SerialT, stream, Ts...>(vals...);
     }
 
 #ifdef __arm__
