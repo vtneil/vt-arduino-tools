@@ -5,17 +5,11 @@
 #include "smart_delay.h"
 
 namespace vt {
-    template<size_t MaxTasks>
-    class task_scheduler;
-
     namespace impl {
         template<typename ReturnType, typename ...Args>
         class task_var_t {
         public:
             typedef ReturnType (*func_ptr)(Args...);
-
-            template<size_t N> friend
-            class task_scheduler;
 
         protected:
             using time_func = smart_delay::time_func;
@@ -39,9 +33,7 @@ namespace vt {
                 return *this;
             };
 
-            void exec(Args ...args) {
-                if ((func != nullptr) && sdl) func(args...);
-            }
+            void exec(Args ...args) { if ((func != nullptr) && sdl) func(args...); }
         };
     }
 
@@ -54,17 +46,16 @@ namespace vt {
         task_t pv_tasks[MaxTasks] = {};
 
     public:
-        bool add_task(task_t::func_ptr func, uint32_t interval, smart_delay::time_func time_unit) {
-            if (pv_size < MaxTasks) {
-                pv_tasks[pv_size++] = task_t(func, interval, time_unit);
-                return true;
-            }
-            return false;
+        task_scheduler &add_task(const task_t &task) {
+            if (pv_size < MaxTasks) pv_tasks[pv_size++] = task;
+            return *this;
         }
 
-        void exec() {
-            for (size_t i = 0; i < pv_size; ++i) pv_tasks[i].exec();
+        constexpr task_scheduler &add_task(task_t::func_ptr func, uint32_t interval, smart_delay::time_func time_unit) {
+            return add_task(task_t(func, interval, time_unit));
         }
+
+        void exec() { for (size_t i = 0; i < pv_size; ++i) pv_tasks[i].exec(); }
     };
 
 }
