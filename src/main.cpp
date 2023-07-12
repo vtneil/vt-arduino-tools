@@ -3,6 +3,7 @@
 
 using namespace vt;
 
+arduino_iostream cout(Serial);
 String s;
 
 //task_scheduler<5> scheduler;
@@ -21,8 +22,6 @@ void setup() {
 void loop() {
 //    scheduler.exec();
     digitalWrite(PC13, !digitalRead(PC13));
-    Serial.print(s.length());
-    Serial.print(" ");
-    Serial.println(s);
+    cout << s.length() << " " << s << endl;
     delay(1000);
 }
