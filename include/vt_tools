@@ -1,4 +1,5 @@
 #include "static_string.h"
+#include "in_place_buffer.h"
 #include "arduino_tools.h"
 #include "arduino_stream.h"
 #include "smart_delay.h"

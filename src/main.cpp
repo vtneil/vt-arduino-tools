@@ -9,6 +9,8 @@ String s;
 //task_scheduler<5> scheduler;
 //task_t task1(setup, 1000, millis);
 
+in_place_buffer<double, 4> buf;
+
 void setup() {
     pinMode(PC13, OUTPUT);
     Serial.begin(115200);
@@ -24,4 +26,6 @@ void loop() {
     digitalWrite(PC13, !digitalRead(PC13));
     cout << s.length() << " " << s << endl;
     delay(1000);
+
+    while (!buf.push(4));
 }
