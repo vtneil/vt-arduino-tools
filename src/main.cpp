@@ -11,6 +11,10 @@ String s;
 
 in_place_buffer<double, 4> buf;
 
+bool test_val(double x, double, double) {
+    return x > 1;
+}
+
 void setup() {
     pinMode(PC13, OUTPUT);
     Serial.begin(115200);
@@ -28,4 +32,8 @@ void loop() {
     delay(1000);
 
     while (!buf.push(4));
+
+    if (buf.any(test_val, 1, 2)) {
+
+    }
 }

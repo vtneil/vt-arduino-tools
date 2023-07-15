@@ -21,10 +21,24 @@ namespace vt {
             return valid();
         }
 
-        T average() const {
-            T tmp;
-            for (size_t i = 0; i < size_; ++i) tmp += arr_[i];
-            return tmp / size_;
+        T sum() const {
+            T result;
+            for (size_t i = 0; i < size_; ++i) result += arr_[i];
+            return result;
+        }
+
+        T average() const { return sum() / size_; }
+
+        template<typename CallablePredicate, typename ...Args>
+        bool all(CallablePredicate predicate, const Args &...args) const {
+            for (size_t i = 0; i < size_; ++i) if (!predicate(arr_[i], args...)) return false;
+            return true;
+        }
+
+        template<typename CallablePredicate, typename ...Args>
+        bool any(CallablePredicate predicate, const Args &...args) const {
+            for (size_t i = 0; i < size_; ++i) if (predicate(arr_[i], args...)) return true;
+            return false;
         }
 
         constexpr bool valid() const { return size_ == N - 1; }
