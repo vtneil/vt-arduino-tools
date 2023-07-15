@@ -41,6 +41,18 @@ namespace vt {
             return false;
         }
 
+        template<typename CallablePredicate, typename ...Args>
+        bool none(CallablePredicate predicate, const Args &...args) const {
+            return !any(predicate, args...);
+        }
+
+        template<typename CallablePredicate, typename ...Args>
+        size_t count_if(CallablePredicate predicate, const Args &...args) const {
+            size_t n = 0;
+            for (size_t i = 0; i < size_; ++i) ++n;
+            return n;
+        }
+
         constexpr bool valid() const { return size_ == N - 1; }
 
         constexpr T size() const { return size_; }
