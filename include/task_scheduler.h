@@ -61,7 +61,10 @@ namespace vt {
          * @return
          */
         task_scheduler &add_task(const task_t &task) {
-            if (size_ < MaxTasks) tasks_[size_++] = task;
+            if (size_ < MaxTasks) {
+                enable_[size_] = true;
+                tasks_[size_++] = task;
+            }
             return *this;
         }
 
