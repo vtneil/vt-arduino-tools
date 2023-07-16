@@ -60,8 +60,8 @@ namespace vt {
          * @param task
          * @return
          */
-        task_scheduler &add_task(const task_t &task) {
-            if (size_ < MaxTasks) {
+        task_scheduler &add_task(const task_t &task, const bool condition = true) {
+            if (condition && size_ < MaxTasks) {
                 enable_[size_] = true;
                 tasks_[size_++] = task;
             }
@@ -76,8 +76,11 @@ namespace vt {
          * @param time_unit
          * @return
          */
-        constexpr task_scheduler &add_task(task_t::func_ptr func, uint32_t interval, smart_delay::time_func time_unit) {
-            return add_task(task_t(func, interval, time_unit));
+        constexpr task_scheduler &add_task(task_t::func_ptr func,
+                                           uint32_t interval,
+                                           smart_delay::time_func time_unit,
+                                           const bool condition = true) {
+            return add_task(task_t(func, interval, time_unit), condition);
         }
 
         /**
@@ -87,8 +90,10 @@ namespace vt {
          * @param sd
          * @return
          */
-        constexpr task_scheduler &add_task(task_t::func_ptr func, const smart_delay &sd) {
-            return add_task(task_t(func, sd));
+        constexpr task_scheduler &add_task(task_t::func_ptr func,
+                                           const smart_delay &sd,
+                                           const bool condition = true) {
+            return add_task(task_t(func, sd), condition);
         }
 
         /**
