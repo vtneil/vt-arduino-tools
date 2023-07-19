@@ -118,7 +118,7 @@ namespace vt {
          *
          * @param func
          */
-        void enable(task_t::func_ptr func) { disable(get_index_from_func_ptr(func)); }
+        void enable(task_t::func_ptr func) { enable(get_index_from_func_ptr(func)); }
 
         /**
          * Disable task based on comparing function pointer if the function is valid.
@@ -129,7 +129,7 @@ namespace vt {
 
         void enable(size_t i) { if (i < MaxTasks) enable_[i] = true; }
 
-        void disable(size_t i) { if (i < MaxTasks) enable_[i] = true; }
+        void disable(size_t i) { if (i < MaxTasks) enable_[i] = false; }
 
         task_t &get_task(task_t::func_ptr func) { return get_task(get_index_from_func_ptr(func)); }
 
