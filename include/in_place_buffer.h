@@ -61,7 +61,7 @@ namespace vt {
         template<typename CallablePredicate, typename ...Args>
         size_t count_if(CallablePredicate predicate, const Args &...args) const {
             size_t n = 0;
-            for (size_t i = 0; i < size_; ++i) ++n;
+            for (size_t i = 0; i < size_; ++i) if (predicate(arr_[i], args...)) ++n;
             return n;
         }
 
