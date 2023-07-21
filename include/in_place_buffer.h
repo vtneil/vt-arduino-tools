@@ -21,8 +21,20 @@ namespace vt {
             return valid();
         }
 
+        T min() const {
+            T result = arr_[0];
+            for (size_t i = 1; i < size_; ++i) if (arr_[i] < arr_[0]) result = arr_[i];
+            return result;
+        }
+
+        T max() const {
+            T result = arr_[0];
+            for (size_t i = 1; i < size_; ++i) if (arr_[i] > arr_[0]) result = arr_[i];
+            return result;
+        }
+
         T sum() const {
-            T result;
+            T result = 0;
             for (size_t i = 0; i < size_; ++i) result += arr_[i];
             return result;
         }
