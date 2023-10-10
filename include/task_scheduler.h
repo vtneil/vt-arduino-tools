@@ -41,6 +41,8 @@ namespace vt {
 
         void exec() { if ((func_ != nullptr) && sdl_) func_(arg_); }
 
+        void reset() { sdl_.reset(); }
+
         func_ptr_t func() { return func_; }
 
         constexpr const uint8_t priority() const { return priority_; }
@@ -58,7 +60,7 @@ namespace vt {
         task_scheduler &add_task(const task_t &task, const bool condition = true) {
             if (condition && size_ < MaxTasks) {
                 size_t i;
-                for (i = 0; i < size_ && tasks_[i].priority <= task.priority(); ++i) static_cast<void>(0);
+                for (i = 0; i < size_ && tasks_[i].priority() <= task.priority(); ++i) static_cast<void>(0);
                 for (size_t j = 0; j < size_ - i; ++j) tasks_[size_ - j] = tasks_[size_ - j - 1];
                 tasks_[i] = task;
                 ++size_;
@@ -84,9 +86,15 @@ namespace vt {
         }
 
         void exec() {
-            for (size_t i = 0; i < size_; ++i) {
+            for (size_t i = 0; i < size_; ++i)
                 tasks_[i].exec();
-            }
+        }
+
+        void clear() { size_ = 0; }
+
+        void reset() {
+            for (size_t i = 0; i < size_; ++i)
+                tasks_[i].reset();
         }
 
         task_t &get_task(task_t::func_ptr_t func) { return get_task(get_index_from_func_ptr(func)); }
