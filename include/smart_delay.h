@@ -9,10 +9,10 @@ namespace vt {
      */
     class smart_delay {
     public:
-        typedef uint32_t (*time_func)();
+        typedef uint32_t (*time_func_t)();
 
     private:
-        time_func func = nullptr;
+        time_func_t time_func = nullptr;
         uint32_t target_interval_val = 0;
         uint32_t previous_time = 0;
         uint32_t true_interval_val = target_interval_val;
@@ -22,10 +22,13 @@ namespace vt {
          * The constructor
          *
          * @param interval
-         * @param func
+         * @param time_func
          */
-        smart_delay(uint32_t interval, time_func func)
-                : func{func}, target_interval_val{interval} { if (func != nullptr) previous_time = func(); }
+        smart_delay(uint32_t interval, time_func_t time_func)
+                : time_func{time_func}, target_interval_val{interval} {
+            if (time_func != nullptr)
+                previous_time = time_func();
+        }
 
         /**
          * Default copy constructor
@@ -54,7 +57,7 @@ namespace vt {
         /**
          * Reset timer's target_interval_val.
          */
-        void reset() { if (func != nullptr) previous_time = func(); }
+        void reset() { if (time_func != nullptr) previous_time = time_func(); }
 
         /**
          * Check if the target_interval_val has passed.
@@ -63,9 +66,10 @@ namespace vt {
          */
         bool has_passed() {
             uint32_t curr_time = 0;
-            if (func != nullptr) curr_time = func();
+            if (time_func != nullptr) curr_time = time_func();
             // Adaptive interval adjustment
             if (curr_time - previous_time >= true_interval_val) {
+                // absolute delta_e
                 uint32_t delta_e = (target_interval_val > true_interval_val) ?
                                    target_interval_val - true_interval_val :
                                    true_interval_val - target_interval_val;
@@ -89,63 +93,9 @@ namespace vt {
          *
          * @param new_func
          */
-        void set_time_func(time_func new_func) { func = new_func; }
+        void set_time_func(time_func_t new_func) { time_func = new_func; }
 
-        time_func get_time_func() const { return func; }
-
-        const uint32_t &target_interval = target_interval_val;
-
-        const uint32_t &true_interval = true_interval_val;
-    };
-
-    /**
-     * Smart Delay without Adaptive interval adjustment wrapper class.
-     *
-     * For testing or when the smart_delay (adaptive) is not working properly.
-     *
-     * Works like plain-old smart delay.
-     */
-    class smart_delay_non_adaptive {
-    public:
-        typedef uint32_t (*time_func)();
-
-    private:
-        time_func func = nullptr;
-        uint32_t target_interval_val = 0;
-        uint32_t previous_time = 0;
-        uint32_t true_interval_val = target_interval_val;
-
-    public:
-        smart_delay_non_adaptive(uint32_t interval, time_func func)
-                : func{func}, target_interval_val{interval} { if (func != nullptr) previous_time = func(); }
-
-        smart_delay_non_adaptive(const smart_delay_non_adaptive &) = default;
-
-        smart_delay_non_adaptive(smart_delay_non_adaptive &&) noexcept = default;
-
-        explicit operator bool() { return has_passed(); }
-
-        explicit operator uint32_t() const { return target_interval_val; }
-
-        void reset() { previous_time = func(); }
-
-        bool has_passed() {
-            uint32_t curr_time = 0;
-            if (func != nullptr) curr_time = func();
-            uint32_t delta_t = curr_time - previous_time;
-            if (delta_t >= target_interval_val) {
-                true_interval_val = delta_t;
-                previous_time = curr_time;
-                return true;
-            }
-            return false;
-        }
-
-        void set_interval(uint32_t new_interval) { target_interval_val = new_interval; }
-
-        void set_time_func(time_func new_func) { func = new_func; }
-
-        time_func get_time_func() { return func; }
+        time_func_t get_time_func() const { return time_func; }
 
         const uint32_t &target_interval = target_interval_val;
 
