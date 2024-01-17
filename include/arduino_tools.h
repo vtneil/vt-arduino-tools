@@ -27,11 +27,27 @@ namespace vt {
      * @param val Value
      * @return built Arduino String
      */
-    template<size_t = 0, bool = false, typename T>
+    template<size_t = 0, typename T>
     String build_string(const T &val) { return String(val); }
 
-    template<size_t = 0, bool = false, typename = String>
+    /**
+     * Build Arduino String from multiple fields, separated by commas.
+     * @param val Value
+     * @return built Arduino String
+     */
+    template<size_t = 0, typename = String>
     String build_string(const String &val) { return val; }
+
+    /**
+     * Build Arduino String from multiple fields, separated by commas.
+     * @return empty Arduino String
+     */
+    template<size_t StringReserveSize = 0, typename = String>
+    String build_string() {
+        String s0 = "";
+        if (StringReserveSize > 0) s0.reserve(StringReserveSize);
+        return s0;
+    }
 
     /**
      * Build Arduino String from multiple fields, separated by commas.
@@ -39,13 +55,13 @@ namespace vt {
      * @param vals Values
      * @return built Arduino String
      */
-    template<size_t StringReserveSize = 128, bool Reserve = true, typename T, typename ...Ts>
+    template<size_t StringReserveSize = 128, typename T, typename ...Ts>
     String build_string(const T &val, const Ts (&...vals)) {
         String s0 = "";
-        if (Reserve) s0.reserve(StringReserveSize);
+        if (StringReserveSize > 0) s0.reserve(StringReserveSize);
         s0 += val;
         s0 += ",";
-        s0 += build_string<StringReserveSize, false, Ts...>(vals...);
+        s0 += build_string<StringReserveSize, Ts...>(vals...);
         return s0;
     }
 

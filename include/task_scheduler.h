@@ -9,6 +9,8 @@ namespace vt {
     public:
         typedef void (*func_ptr_t)(void *);
 
+        typedef void (*func_ptr_reduced_t)();
+
     protected:
         using time_func = smart_delay::time_func_t;
 
@@ -26,16 +28,26 @@ namespace vt {
         task_t(func_ptr_t func_to_run, void *arg, const smart_delay &sd, uint8_t priority = 0)
                 : func_{func_to_run}, arg_{arg}, sdl_{sd}, priority_(priority) {}
 
+        task_t(func_ptr_reduced_t func_to_run, void *arg, uint32_t interval,
+               time_func time_unit_func, uint8_t priority = 0)
+                : func_{reinterpret_cast<func_ptr_t>(func_to_run)}, arg_{arg},
+                  sdl_{smart_delay(interval, time_unit_func)}, priority_(priority) {}
+
+        task_t(func_ptr_reduced_t func_to_run, void *arg, const smart_delay &sd, uint8_t priority = 0)
+                : func_{reinterpret_cast<func_ptr_t>(func_to_run)}, arg_{arg}, sdl_{sd}, priority_(priority) {}
+
         task_t(const task_t &) = default;
 
         task_t(task_t &&) noexcept = default;
 
         task_t &operator=(const task_t &other) {
-            func_ = other.func_;
-            arg_ = other.arg_;
-            sdl_.set_interval(other.sdl_.target_interval);
-            sdl_.set_time_func(other.sdl_.get_time_func());
-            priority_ = other.priority_;
+            if (&other != this) {
+                func_ = other.func_;
+                arg_ = other.arg_;
+                sdl_.set_interval(other.sdl_.target_interval);
+                sdl_.set_time_func(other.sdl_.get_time_func());
+                priority_ = other.priority_;
+            }
             return *this;
         };
 
@@ -78,6 +90,23 @@ namespace vt {
         }
 
         constexpr task_scheduler &add_task(task_t::func_ptr_t func,
+                                           void *arg_ptr,
+                                           const smart_delay &sd,
+                                           uint8_t priority = 0,
+                                           const bool condition = true) {
+            return add_task(task_t(func, arg_ptr, sd, priority), condition);
+        }
+
+        constexpr task_scheduler &add_task(task_t::func_ptr_reduced_t func,
+                                           void *arg_ptr,
+                                           uint32_t interval,
+                                           smart_delay::time_func_t time_unit,
+                                           uint8_t priority = 0,
+                                           const bool condition = true) {
+            return add_task(task_t(func, arg_ptr, interval, time_unit, priority), condition);
+        }
+
+        constexpr task_scheduler &add_task(task_t::func_ptr_reduced_t func,
                                            void *arg_ptr,
                                            const smart_delay &sd,
                                            uint8_t priority = 0,
