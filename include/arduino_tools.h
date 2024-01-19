@@ -7,18 +7,18 @@
 
 namespace vt {
     template<bool First = true, typename T>
-    String &build_string_to(String &s0, const T &val) {
+    String &build_csv_to(String &s0, const T &val) {
         if (First) s0 = "";
         s0 += val;
         return s0;
     }
 
     template<bool First = true, typename T, typename ...Ts>
-    String &build_string_to(String &s0, const T &val, const Ts (&...vals)) {
+    String &build_csv_to(String &s0, const T &val, const Ts (&...vals)) {
         if (First) s0 = "";
         s0 += val;
         s0 += ",";
-        build_string_to<false, Ts...>(s0, vals...);
+        build_csv_to<false, Ts...>(s0, vals...);
         return s0;
     }
 
@@ -28,7 +28,7 @@ namespace vt {
      * @return built Arduino String
      */
     template<size_t = 0, typename T>
-    String build_string(const T &val) { return String(val); }
+    String build_csv(const T &val) { return String(val); }
 
     /**
      * Build Arduino String from multiple fields, separated by commas.
@@ -36,14 +36,14 @@ namespace vt {
      * @return built Arduino String
      */
     template<size_t = 0, typename = String>
-    String build_string(const String &val) { return val; }
+    String build_csv(const String &val) { return val; }
 
     /**
      * Build Arduino String from multiple fields, separated by commas.
      * @return empty Arduino String
      */
     template<size_t StringReserveSize = 0, typename = String>
-    String build_string() {
+    String build_csv() {
         String s0 = "";
         if (StringReserveSize > 0) s0.reserve(StringReserveSize);
         return s0;
@@ -56,11 +56,68 @@ namespace vt {
      * @return built Arduino String
      */
     template<size_t StringReserveSize = 128, typename T, typename ...Ts>
-    String build_string(const T &val, const Ts (&...vals)) {
+    String build_csv(const T &val, const Ts (&...vals)) {
         String s0 = "";
         if (StringReserveSize > 0) s0.reserve(StringReserveSize);
         s0 += val;
         s0 += ",";
+        s0 += build_csv<StringReserveSize, Ts...>(vals...);
+        return s0;
+    }
+
+    template<bool First = true, typename T>
+    String &build_string_to(String &s0, const T &val) {
+        if (First) s0 = "";
+        s0 += val;
+        return s0;
+    }
+
+    template<bool First = true, typename T, typename ...Ts>
+    String &build_string_to(String &s0, const T &val, const Ts (&...vals)) {
+        if (First) s0 = "";
+        s0 += val;
+        build_string_to<false, Ts...>(s0, vals...);
+        return s0;
+    }
+
+    /**
+     * Build Arduino String from multiple fields.
+     * @param val Value
+     * @return built Arduino String
+     */
+    template<size_t = 0, typename T>
+    String build_string(const T &val) { return String(val); }
+
+    /**
+     * Build Arduino String from multiple fields.
+     * @param val Value
+     * @return built Arduino String
+     */
+    template<size_t = 0, typename = String>
+    String build_string(const String &val) { return val; }
+
+    /**
+     * Build Arduino String from multiple fields
+     * @return empty Arduino String
+     */
+    template<size_t StringReserveSize = 0, typename = String>
+    String build_string() {
+        String s0 = "";
+        if (StringReserveSize > 0) s0.reserve(StringReserveSize);
+        return s0;
+    }
+
+    /**
+     * Build Arduino String from multiple fields.
+     * @param val Value
+     * @param vals Values
+     * @return built Arduino String
+     */
+    template<size_t StringReserveSize = 128, typename T, typename ...Ts>
+    String build_string(const T &val, const Ts (&...vals)) {
+        String s0 = "";
+        if (StringReserveSize > 0) s0.reserve(StringReserveSize);
+        s0 += val;
         s0 += build_string<StringReserveSize, Ts...>(vals...);
         return s0;
     }
